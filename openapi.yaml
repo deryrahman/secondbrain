@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: SecondBrain Service
+  description: |
+    The API provides essentials endpoints for developers
+    to build their own client or application.
+  version: 0.0.1
+servers:
+  - url: https://server.com/v0.1.0
+paths:
+  /ping:
+    get:
+      responses:
+        200:
+          description: system is up
+          content:
+            application/json:
+              schema:
+                type: string
+  /records:
+    post:
+      tags:
+        - record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        201:
+          description: record is created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+    get:
+      tags:
+        - record
+      responses:
+        200:
+          description: record found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record_snippets:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/record_snippet"
+tags:
+  - name: record
+  - name: user
+components:
+  schemas:
+    record_snippet:
+      description: Snippet of the record resource
+      type: object
+      properties:
+        id:
+          type: string
+        excerpt:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
