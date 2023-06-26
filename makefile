@@ -1,3 +1,9 @@
+.PHONY: all build
+
+build:
+	rm -rf build
+	mkdir build
+	go build -o ./build/secondbrain ./cmd
 
 generate-handler:
 	rm -r ./codegen/handler/*
@@ -7,3 +13,4 @@ generate-handler:
 generate-storage:
 	rm -r ./codegen/storage/*
 	sqlc generate
+	
