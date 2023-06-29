@@ -6,9 +6,7 @@ type Logger interface {
 	Warnf(format string, args ...any)
 	Errorf(format string, args ...any)
 	Fatalf(format string, args ...any)
-}
 
-type LoggerWithErrReceiver interface {
-	Logger
 	Error(err error)
+	Fatal(err error)
 }

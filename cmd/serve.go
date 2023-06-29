@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	slogx "github.com/deryrahman/secondbrain/pkg/log/slog"
+	log "github.com/deryrahman/secondbrain/pkg/log/slog"
 	server "github.com/deryrahman/secondbrain/server/http"
 	"github.com/deryrahman/secondbrain/service/core"
 	storage "github.com/deryrahman/secondbrain/storage/postgresql"
@@ -29,7 +29,7 @@ func serveActionFunc() cli.ActionFunc {
 		dsn := ctx.String("dsn")
 		port := fmt.Sprintf(":%s", ctx.String("port"))
 
-		logger := slogx.NewSLog(slog.DebugLevel)
+		logger := log.NewSLog(slog.DebugLevel)
 		db, err := storage.NewPSQLDB(dsn)
 		if err != nil {
 			logger.Fatal(err)

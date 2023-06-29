@@ -1,5 +1,11 @@
 package errors
 
+var _ JoinErr = (*joinError)(nil)
+
+type joinError struct {
+	errs []error
+}
+
 func Join(errs ...error) error {
 	e := &joinError{
 		errs: []error{},
@@ -14,10 +20,6 @@ func Join(errs ...error) error {
 		}
 	}
 	return e
-}
-
-type joinError struct {
-	errs []error
 }
 
 func (e *joinError) Error() string {

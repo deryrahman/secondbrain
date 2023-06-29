@@ -8,7 +8,7 @@ import (
 	"github.com/deryrahman/secondbrain/service"
 )
 
-func HandleHTTPPostRecords(logger log.LoggerWithErrReceiver, s service.RecordService) http.HandlerFunc {
+func HandleHTTPPostRecords(logger log.Logger, s service.RecordService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req, err := NewHTTPRequest[model.PostRecordsJSONRequestBody](r)
 		if err != nil {

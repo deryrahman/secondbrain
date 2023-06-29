@@ -2,15 +2,9 @@ package errors
 
 import (
 	"runtime"
-	"strings"
 )
 
-type ErrorCause interface {
-	Error() string
-	At() *runtime.Frame
-}
-
-var _ ErrorCause = (*rootCause)(nil)
+var _ RootCauseErr = (*rootCause)(nil)
 
 type rootCause struct {
 	caller *runtime.Frame
@@ -48,19 +42,4 @@ func createRootCause(cause error) error {
 	}
 
 	return err
-}
-
-/* "FuncName" or "Receiver.MethodName" */
-func shortFuncName(f *runtime.Func) string {
-	longName := f.Name()
-
-	withoutPath := longName[strings.LastIndex(longName, "/")+1:]
-	withoutPackage := withoutPath[strings.Index(withoutPath, ".")+1:]
-
-	shortName := withoutPackage
-	shortName = strings.Replace(shortName, "(", "", 1)
-	shortName = strings.Replace(shortName, "*", "", 1)
-	shortName = strings.Replace(shortName, ")", "", 1)
-
-	return shortName
 }

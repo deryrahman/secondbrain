@@ -1,4 +1,4 @@
-package slog
+package log
 
 import (
 	"os"
@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	_ log.Logger                = (*logger)(nil)
-	_ log.LoggerWithErrReceiver = (*logger)(nil)
+	_ log.Logger = (*logger)(nil)
 )
 
 type logger struct {
@@ -35,8 +34,16 @@ func NewSLog(level slog.Level, setFns ...slog.SugaredLoggerFn) *logger {
 
 func (l *logger) Error(err error) {
 	r := l.Record()
-	if e, ok := err.(errors.ErrorCause); ok {
+	if e, ok := err.(errors.RootCauseErr); ok && e.At() != nil {
 		r.Caller = e.At()
 	}
 	r.Logf(slog.ErrorLevel, err.Error())
+}
+
+func (l *logger) Fatal(err error) {
+	r := l.Record()
+	if e, ok := err.(errors.RootCauseErr); ok && e.At() != nil {
+		r.Caller = e.At()
+	}
+	r.Logf(slog.FatalLevel, err.Error())
 }

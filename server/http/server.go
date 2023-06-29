@@ -16,11 +16,11 @@ var _ http.Handler = (*httpServer)(nil)
 
 type httpServer struct {
 	baseURL       string
-	logger        log.LoggerWithErrReceiver
+	logger        log.Logger
 	recordService service.RecordService
 }
 
-func NewHTTPServer(baseURL string, logger log.LoggerWithErrReceiver, recordService service.RecordService) (*httpServer, error) {
+func NewHTTPServer(baseURL string, logger log.Logger, recordService service.RecordService) (*httpServer, error) {
 	var err error
 	if recordService == nil {
 		err = errors.Join(err, fmt.Errorf("recordService is nil"))
