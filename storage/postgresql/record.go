@@ -40,7 +40,10 @@ func NewRecordStoragePSQL(db storage.DB, querier codegenStorage.Querier) (*recor
 }
 
 func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, content string, tags ...string) (*model.RecordOnStorage, error) {
-	tx, _ := s.db.BeginTx(ctx, nil)
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, errors.RootCause(err)
+	}
 
 	createRecordParams := codegenStorage.CreateRecordParams{ID: id, Content: content}
 	recordID, err := s.querier.CreateRecord(ctx, tx, createRecordParams)

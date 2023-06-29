@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	slogx "github.com/deryrahman/secondbrain/pkg/log/slog"
 	server "github.com/deryrahman/secondbrain/server/http"
 	"github.com/deryrahman/secondbrain/service/core"
 	storage "github.com/deryrahman/secondbrain/storage/postgresql"
+	"github.com/gookit/slog"
 	"github.com/urfave/cli/v2"
 )
 
@@ -27,13 +29,27 @@ func serveActionFunc() cli.ActionFunc {
 		dsn := ctx.String("dsn")
 		port := fmt.Sprintf(":%s", ctx.String("port"))
 
+		logger := slogx.NewSLog(slog.DebugLevel)
 		db, err := storage.NewPSQLDB(dsn)
 		if err != nil {
+			logger.Fatal(err)
 			return err
 		}
-		recordStorage, _ := storage.NewRecordStoragePSQL(db, storage.NewPSQLQuerier())
-		recordService, _ := core.NewRecordService(recordStorage)
-		httpServer, _ := server.NewHTTPServer("/api/v0.0.1", recordService)
+		recordStorage, err := storage.NewRecordStoragePSQL(db, storage.NewPSQLQuerier())
+		if err != nil {
+			logger.Fatal(err)
+			return err
+		}
+		recordService, err := core.NewRecordService(recordStorage)
+		if err != nil {
+			logger.Fatal(err)
+			return err
+		}
+		httpServer, err := server.NewHTTPServer("/api/v0.0.1", logger, recordService)
+		if err != nil {
+			logger.Fatal(err)
+			return err
+		}
 
 		return http.ListenAndServe(port, httpServer)
 	}

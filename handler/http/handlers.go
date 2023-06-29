@@ -4,18 +4,39 @@ import (
 	"net/http"
 
 	"github.com/deryrahman/secondbrain/model"
+	"github.com/deryrahman/secondbrain/pkg/log"
 	"github.com/deryrahman/secondbrain/service"
 )
 
-func HandleHTTPPostRecords(s service.RecordService) http.HandlerFunc {
+func HandleHTTPPostRecords(logger log.LoggerWithErrReceiver, s service.RecordService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req, _ := NewHTTPRequest[model.PostRecordsJSONRequestBody](r)
-		reqBody, _ := req.GetJSONBody()
+		req, err := NewHTTPRequest[model.PostRecordsJSONRequestBody](r)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		reqBody, err := req.GetJSONBody()
+		if err != nil {
+			logger.Error(err)
+			return
+		}
 
-		id, _ := s.CreateRecord(r.Context(), *reqBody.Content, *reqBody.Tags...)
+		id, err := s.CreateRecord(r.Context(), *reqBody.Content, *reqBody.Tags...)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
 
-		resp, _ := NewHTTPResponse(w)
-		resp.WriteJSON(model.PostRecordsJSONResponseBody{Id: id})
+		resp, err := NewHTTPResponse(w)
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+		if err := resp.WriteJSON(model.PostRecordsJSONResponseBody{Id: id}); err != nil {
+			logger.Error(err)
+			return
+		}
+		logger.Infof("success")
 	}
 }
 
