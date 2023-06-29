@@ -7,7 +7,7 @@ Running the server should be as seamless as possible by running the command `sb 
 
 ## Framework Choices
 To create as simple as generic possible, this project won't use any fancy web framework. Initial implementation will use net/http, later on fancy web framework can be used if use cases force it to doing so.
-Persistence layer uses sqlc to achieve query based storage development. While go-migration is used to migrate the schema.
+Persistence layer uses sqlc to achieve query based storage development. While sql-migrate is used to migrate the schema.
 Handler layer uses open api generator to achieve design first implementation.
 
 ## Config Specs

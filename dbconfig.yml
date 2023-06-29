@@ -1,0 +1,5 @@
+development:
+  dialect: postgres
+  datasource: postgresql://${DB_USER}:${DB_PASSWORD}@localhost:5432/secondbrain_dev?sslmode=disable
+  dir: storage/postgresql/schema
+  table: migrations
