@@ -47,6 +47,10 @@ select id, content, record_id, tag_id from record join record_tag on id=record_i
 where tag_id=$1
 `
 
+type GetRecordsByTagParams struct {
+	TagID string
+}
+
 type GetRecordsByTagRow struct {
 	ID       uuid.UUID
 	Content  string
@@ -54,8 +58,8 @@ type GetRecordsByTagRow struct {
 	TagID    string
 }
 
-func (q *Queries) GetRecordsByTag(ctx context.Context, db DBTX, tagID string) ([]GetRecordsByTagRow, error) {
-	rows, err := db.QueryContext(ctx, getRecordsByTag, tagID)
+func (q *Queries) GetRecordsByTag(ctx context.Context, db DBTX, arg GetRecordsByTagParams) ([]GetRecordsByTagRow, error) {
+	rows, err := db.QueryContext(ctx, getRecordsByTag, arg.TagID)
 	if err != nil {
 		return nil, err
 	}

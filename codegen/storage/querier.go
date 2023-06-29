@@ -13,9 +13,9 @@ import (
 type Querier interface {
 	AssociateNoteToTag(ctx context.Context, db DBTX, arg AssociateNoteToTagParams) error
 	CreateRecord(ctx context.Context, db DBTX, arg CreateRecordParams) (uuid.UUID, error)
-	GetRecordsByTag(ctx context.Context, db DBTX, tagID string) ([]GetRecordsByTagRow, error)
-	GetTag(ctx context.Context, db DBTX, id string) (string, error)
-	UpsertTag(ctx context.Context, db DBTX, id string) error
+	GetRecordsByTag(ctx context.Context, db DBTX, arg GetRecordsByTagParams) ([]GetRecordsByTagRow, error)
+	GetTag(ctx context.Context, db DBTX, arg GetTagParams) (string, error)
+	UpsertTag(ctx context.Context, db DBTX, arg UpsertTagParams) error
 }
 
 var _ Querier = (*Queries)(nil)

@@ -4,14 +4,12 @@ sql:
   queries:
     - "./storage/postgresql/query/record.sql"
     - "./storage/postgresql/query/tag.sql"
-  schema:
-    - "./storage/postgresql/schema/record.sql"
-    - "./storage/postgresql/schema/tag.sql"
-    - "./storage/postgresql/schema/record_tag.sql"
+  schema: "./storage/postgresql/schema"
   gen:
     go:
       package: "storage"
       out: "codegen/storage"
       output_files_suffix: ".psql"
-      emit_interface: true
+      emit_interface: true  
       emit_methods_with_db_argument: true
+      query_parameter_limit: 0

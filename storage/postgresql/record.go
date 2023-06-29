@@ -50,7 +50,8 @@ func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, 
 	}
 
 	for _, tag := range tags {
-		if err := s.querier.UpsertTag(ctx, tx, tag); err != nil {
+		upsertTagPArams := codegenStorage.UpsertTagParams{ID: tag}
+		if err := s.querier.UpsertTag(ctx, tx, upsertTagPArams); err != nil {
 			tx.Rollback()
 			return nil, err
 		}

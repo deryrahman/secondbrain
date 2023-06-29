@@ -14,8 +14,13 @@ SELECT id FROM tag
 WHERE id = $1
 `
 
-func (q *Queries) GetTag(ctx context.Context, db DBTX, id string) (string, error) {
-	row := db.QueryRowContext(ctx, getTag, id)
+type GetTagParams struct {
+	ID string
+}
+
+func (q *Queries) GetTag(ctx context.Context, db DBTX, arg GetTagParams) (string, error) {
+	row := db.QueryRowContext(ctx, getTag, arg.ID)
+	var id string
 	err := row.Scan(&id)
 	return id, err
 }
@@ -25,7 +30,11 @@ insert into tag (id) values ($1)
 on conflict (id) do nothing
 `
 
-func (q *Queries) UpsertTag(ctx context.Context, db DBTX, id string) error {
-	_, err := db.ExecContext(ctx, upsertTag, id)
+type UpsertTagParams struct {
+	ID string
+}
+
+func (q *Queries) UpsertTag(ctx context.Context, db DBTX, arg UpsertTagParams) error {
+	_, err := db.ExecContext(ctx, upsertTag, arg.ID)
 	return err
 }
