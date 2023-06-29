@@ -6,10 +6,12 @@ info:
     to build their own client or application.
   version: 0.0.1
 servers:
-  - url: https://server.com/v0.1.0
+  - url: http://localhost:8080/api/v0.0.1
 paths:
   /ping:
     get:
+      tags:
+        - system
       responses:
         200:
           description: system is up
@@ -61,6 +63,7 @@ paths:
 tags:
   - name: record
   - name: user
+  - name: system
 components:
   schemas:
     record_snippet:
