@@ -1,4 +1,5 @@
 # [RFC 2] Server Implementation
+Status: Implemented
 
 Purpose of this RFC is to define the server implementation for minimal setup of the project. It includes explanation about the expectation of how the server runs, framework choices, config specification, database design, etc.
 

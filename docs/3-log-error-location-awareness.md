@@ -1,6 +1,7 @@
 # [RFC 3] Log Error Location Awareness
+Status: Implemented
 
-Usually log is used whenever some function encounter error. However, on the same trace which path of the error is happening, same error message will be printed on multiple layer. This makes redundant message. This RFC discuss about how log should handle error so that it only print the message where the error is happening.
+Usually log is used whenever some function encounter error. However, logger are not aware where the root cause of error is happened, thus same error message will be printed on multiple layer. This makes redundant message. This RFC discuss about how log should handle error so that it only print the message where the error is happening.
 
 ## Design
 
@@ -68,6 +69,7 @@ return err
 ## Approach
 
 **Address based marker on log struct**
+
 ```go
 func (l Log) Error(err error) {
   if ee, ok := err.(*joinError); ok {
@@ -84,11 +86,11 @@ func (l Log) Error(err error) {
 }
 ```
 
-Pros: simple implementation
-Cons: complex way to handle reused mem address
-
+- Pros: simple implementation
+- Cons: complex way to handle reused mem address
 
 **Accumulate and print the error array**
+
 Logger contains worker which will print the error at interval. Same err won't be printed twice.
 ```go
 func NewLog() Log {
@@ -113,10 +115,11 @@ func (Log) print() {
 }
 ```
 
-Pros: simple implemnentation
-Cons: additional worker, which delayed the printing process
+- Pros: simple implemnentation
+- Cons: additional worker, which delayed the printing process
 
-**Entirely new approach using custom error**
+**Entirely new approach using custom error** (ACCEPTED)
+
 Realizing that the implementation above can lead to unecessary complexity, creating new custom error should be sufficient.
 
 By nature, error flow can be modelled like this
@@ -145,5 +148,3 @@ func (Log) ErrorCause(err error) {
   // proceed
 }
 ```
-
-- `RootCause` should store the line number, function name, and filename

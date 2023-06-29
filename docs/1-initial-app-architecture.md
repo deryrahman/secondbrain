@@ -1,5 +1,5 @@
 # [RFC 1] Initial App Architecture
-Status: Draft
+Status: Done
 
 This RFC covers detail of how the app should be implemented in minimal fashion. It includes the architecture of the app implementa†ion should follow, the minimal API details which RFC 0 is mentioned, and tech stack choices (programming language and database engine).
 

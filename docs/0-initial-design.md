@@ -1,5 +1,5 @@
 # [RFC 0] Initial Design
-Status: Draft
+Status: Done
 
 The purpose of this initial RFC is to define what the app's capabilities, terminologies, limitations, initial architectures, and the possible core components needed.
 
