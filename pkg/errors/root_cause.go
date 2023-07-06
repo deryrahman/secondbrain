@@ -4,22 +4,25 @@ import (
 	"runtime"
 )
 
-var _ RootCauseErr = (*rootCause)(nil)
+var _ RootCauseError = (*rootCauseError)(nil)
 
-type rootCause struct {
+type rootCauseError struct {
 	caller *runtime.Frame
-	msg    string
+	err    error
 }
 
 func RootCause(err error) error {
+	if err == nil {
+		return nil
+	}
 	return createRootCause(err)
 }
 
-func (r *rootCause) Error() string {
-	return r.msg
+func (r *rootCauseError) Error() string {
+	return r.err.Error()
 }
 
-func (r *rootCause) At() *runtime.Frame {
+func (r *rootCauseError) At() *runtime.Frame {
 	return r.caller
 }
 
@@ -35,9 +38,10 @@ func getCaller(callerSkip int) (fr runtime.Frame, ok bool) {
 }
 
 func createRootCause(cause error) error {
-	err := &rootCause{msg: cause.Error()}
+	err := &rootCauseError{err: cause}
 
-	if caller, ok := getCaller(4); ok {
+	lvl := 4 // stack level
+	if caller, ok := getCaller(lvl); ok {
 		err.caller = &caller
 	}
 

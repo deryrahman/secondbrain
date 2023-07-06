@@ -33,24 +33,24 @@ func serveActionFunc() cli.ActionFunc {
 		db, err := storage.NewPSQLDB(dsn)
 		if err != nil {
 			logger.Fatal(err)
-			return err
+			return err //nolint:wrapcheck
 		}
 		recordStorage, err := storage.NewRecordStoragePSQL(db, storage.NewPSQLQuerier())
 		if err != nil {
 			logger.Fatal(err)
-			return err
+			return err //nolint:wrapcheck
 		}
 		recordService, err := core.NewRecordService(recordStorage)
 		if err != nil {
 			logger.Fatal(err)
-			return err
+			return err //nolint:wrapcheck
 		}
 		httpServer, err := server.NewHTTPServer("/api/v0.0.1", logger, recordService)
 		if err != nil {
 			logger.Fatal(err)
-			return err
+			return err //nolint:wrapcheck
 		}
 
-		return http.ListenAndServe(port, httpServer)
+		return http.ListenAndServe(port, httpServer) //nolint:wrapcheck
 	}
 }

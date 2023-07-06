@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/deryrahman/secondbrain/handler"
+	"github.com/deryrahman/secondbrain/pkg/errors"
 )
 
 var _ handler.HTTPResponse = (*response)(nil)
@@ -24,8 +25,8 @@ func NewHTTPResponse(httpWriter http.ResponseWriter) (*response, error) {
 func (r *response) WriteJSON(content any) error {
 	raw, err := json.Marshal(content)
 	if err != nil {
-		return err
+		return errors.RootCause(err)
 	}
 	_, err = r.Write(raw)
-	return err
+	return errors.RootCause(err)
 }

@@ -3,11 +3,12 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/deryrahman/secondbrain/handler"
+	"github.com/deryrahman/secondbrain/pkg/errors"
 )
 
 var _ handler.HTTPRequest[any] = (*request[any])(nil)
@@ -25,23 +26,23 @@ func NewHTTPRequest[bodyStruct any](httpReq *http.Request) (*request[bodyStruct]
 
 func (r *request[bodyStruct]) GetJSONBody() (bodyStruct, error) {
 	var value bodyStruct
-	raw, err := ioutil.ReadAll(r.Body)
+	raw, err := io.ReadAll(r.Body)
 	if err != nil {
 		r.Body.Close()
-		return value, err
+		return value, errors.RootCause(err)
 	}
 
 	if err := json.Unmarshal(raw, &value); err != nil {
-		return value, err
+		return value, errors.RootCause(err)
 	}
 
-	return value, err
+	return value, nil
 }
 
 func (r *request[bodyStruct]) GetHeaders() http.Header {
-	return r.GetHeaders()
+	return r.Response.Header
 }
 
 func (r *request[bodyStruct]) GetURL() url.URL {
-	return r.GetURL()
+	return *r.Request.URL
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/deryrahman/secondbrain/model"
+	"github.com/deryrahman/secondbrain/pkg/errors"
 	"github.com/deryrahman/secondbrain/service"
 	"github.com/deryrahman/secondbrain/storage"
 	"github.com/google/uuid"
@@ -34,7 +35,7 @@ func (s *recordService) CreateRecord(ctx context.Context, content string, tags .
 	id := uuid.New()
 	_, err := s.recordStorager.CreateRecordWithTags(ctx, id, content, tags...)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err)
 	}
 	return id.String(), nil
 }

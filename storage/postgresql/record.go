@@ -30,7 +30,7 @@ func NewRecordStoragePSQL(db storage.DB, querier codegenStorage.Querier) (*recor
 		err = errors.Join(err, fmt.Errorf("querier is nil"))
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.RootCause(err)
 	}
 
 	return &recordStorage{
@@ -48,24 +48,32 @@ func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, 
 	createRecordParams := codegenStorage.CreateRecordParams{ID: id, Content: content}
 	recordID, err := s.querier.CreateRecord(ctx, tx, createRecordParams)
 	if err != nil {
-		tx.Rollback()
-		return nil, err
+		if e := tx.Rollback(); e != nil {
+			err = errors.Join(err, e)
+		}
+		return nil, errors.RootCause(err)
 	}
 
 	for _, tag := range tags {
 		upsertTagPArams := codegenStorage.UpsertTagParams{ID: tag}
 		if err := s.querier.UpsertTag(ctx, tx, upsertTagPArams); err != nil {
-			tx.Rollback()
-			return nil, err
+			if e := tx.Rollback(); e != nil {
+				err = errors.Join(err, e)
+			}
+			return nil, errors.RootCause(err)
 		}
 		associateRecordToTagParams := codegenStorage.AssociateNoteToTagParams{RecordID: recordID, TagID: tag}
 		if err := s.querier.AssociateNoteToTag(ctx, tx, associateRecordToTagParams); err != nil {
-			tx.Rollback()
-			return nil, err
+			if e := tx.Rollback(); e != nil {
+				err = errors.Join(err, e)
+			}
+			return nil, errors.RootCause(err)
 		}
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, errors.RootCause(err)
+	}
 	return &model.RecordOnStorage{ID: id, Content: content}, nil
 }
 

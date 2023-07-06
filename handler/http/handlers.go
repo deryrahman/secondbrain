@@ -42,9 +42,14 @@ func HandleHTTPPostRecords(logger log.Logger, s service.RecordService) http.Hand
 
 func HandleHTTPGetRecords(s service.RecordService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.GetRecords(r.Context())
+		_, err := s.GetRecords(r.Context())
+		if err != nil {
+			return
+		}
 
 		resp, _ := NewHTTPResponse(w)
-		resp.WriteJSON(model.GetRecordsJSONResponseBody{})
+		if err := resp.WriteJSON(model.GetRecordsJSONResponseBody{}); err != nil {
+			return
+		}
 	}
 }

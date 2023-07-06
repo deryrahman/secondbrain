@@ -2,7 +2,7 @@ package errors
 
 import "runtime"
 
-type RootCauseErr interface {
+type RootCauseError interface {
 	Error() string
 	At() *runtime.Frame
 }

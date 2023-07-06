@@ -1,5 +1,7 @@
 package errors
 
+import "errors"
+
 var _ JoinErr = (*joinError)(nil)
 
 type joinError struct {
@@ -12,12 +14,16 @@ func Join(errs ...error) error {
 	}
 	for _, err := range errs {
 		if err != nil {
-			if joinErr, ok := err.(*joinError); ok {
-				e.errs = append(e.errs, Join(joinErr.errs...))
+			var joinErr JoinErr
+			if errors.As(err, &joinErr) {
+				e.errs = append(e.errs, Join(joinErr.Unwrap()...))
 			} else {
 				e.errs = append(e.errs, err)
 			}
 		}
+	}
+	if len(e.errs) == 0 {
+		return nil
 	}
 	return e
 }

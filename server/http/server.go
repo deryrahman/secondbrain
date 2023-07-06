@@ -1,12 +1,12 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
 	codegenHandler "github.com/deryrahman/secondbrain/codegen/handler"
 	handler "github.com/deryrahman/secondbrain/handler/http"
+	"github.com/deryrahman/secondbrain/pkg/errors"
 	"github.com/deryrahman/secondbrain/pkg/log"
 	"github.com/deryrahman/secondbrain/service"
 )
@@ -29,7 +29,7 @@ func NewHTTPServer(baseURL string, logger log.Logger, recordService service.Reco
 		err = errors.Join(err, fmt.Errorf("logger is nil"))
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.RootCause(err)
 	}
 
 	return &httpServer{
@@ -58,5 +58,7 @@ func (h *httpServer) PostRecords(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *httpServer) GetPing(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`pong`))
+	if _, err := w.Write([]byte(`pong`)); err != nil {
+		return
+	}
 }

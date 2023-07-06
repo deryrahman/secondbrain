@@ -20,5 +20,6 @@ func main() {
 	app.Commands = []*cli.Command{serveCommand()}
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 }

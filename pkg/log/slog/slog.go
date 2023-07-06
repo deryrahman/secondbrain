@@ -33,17 +33,18 @@ func NewSLog(level slog.Level, setFns ...slog.SugaredLoggerFn) *logger {
 }
 
 func (l *logger) Error(err error) {
-	r := l.Record()
-	if e, ok := err.(errors.RootCauseErr); ok && e.At() != nil {
-		r.Caller = e.At()
-	}
-	r.Logf(slog.ErrorLevel, err.Error())
+	l.logErr(slog.ErrorLevel, err)
 }
 
 func (l *logger) Fatal(err error) {
+	l.logErr(slog.FatalLevel, err)
+}
+
+func (l *logger) logErr(level slog.Level, err error) {
 	r := l.Record()
-	if e, ok := err.(errors.RootCauseErr); ok && e.At() != nil {
+	var e errors.RootCauseError
+	if errors.As(err, &e) && e.At() != nil {
 		r.Caller = e.At()
 	}
-	r.Logf(slog.FatalLevel, err.Error())
+	r.Logf(level, err.Error())
 }

@@ -5,6 +5,9 @@ build:
 	mkdir build
 	go build -o ./build/secondbrain ./cmd
 
+lint:
+	golangci-lint run
+
 generate-handler:
 	rm -r ./codegen/handler/*
 	oapi-codegen -package handler -generate types -o ./codegen/handler/models.go openapi.yaml
