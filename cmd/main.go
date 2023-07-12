@@ -1,19 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	version = "v0.0.1"
+var ( // metadata for goreleaser ldflags
+	version string
+	commit  string
+	date    string
 )
 
 func main() {
+	cli.VersionPrinter = func(ctx *cli.Context) {
+		fmt.Printf("%s\n", ctx.App.Version)
+	}
+
 	app := &cli.App{
-		Name:    "secondbrain cli 2",
+		Name:    "secondbrain cli",
 		Version: version,
 	}
 
