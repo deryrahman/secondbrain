@@ -1,7 +1,8 @@
 .PHONY: all build
 
 build:
-	goreleaser build --single-target --clean --snapshot
+	rm -rf build && mkdir -p build
+	goreleaser build --single-target --clean --snapshot --output ./build/secondbrain
 
 lint:
 	golangci-lint run
