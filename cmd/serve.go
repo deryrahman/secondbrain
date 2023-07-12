@@ -45,12 +45,14 @@ func serveActionFunc() cli.ActionFunc {
 			logger.Fatal(err)
 			return err //nolint:wrapcheck
 		}
-		httpServer, err := server.NewHTTPServer("/api/v0.0.1", logger, recordService)
+		apiPath := fmt.Sprintf("/api/%s", version)
+		httpServer, err := server.NewHTTPServer(apiPath, logger, recordService)
 		if err != nil {
 			logger.Fatal(err)
 			return err //nolint:wrapcheck
 		}
 
+		logger.Infof("server running on port %s", port)
 		return http.ListenAndServe(port, httpServer) //nolint:wrapcheck
 	}
 }

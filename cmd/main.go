@@ -8,7 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var ( // metadata for goreleaser ldflags
+var (
+	// metadata for goreleaser ldflags
 	version string
 	commit  string
 	date    string

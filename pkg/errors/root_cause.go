@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"net/http"
 	"runtime"
 )
 
@@ -8,6 +9,7 @@ var _ RootCauseError = (*rootCauseError)(nil)
 
 type rootCauseError struct {
 	caller *runtime.Frame
+	code   int
 	err    error
 }
 
@@ -15,7 +17,14 @@ func RootCause(err error) error {
 	if err == nil {
 		return nil
 	}
-	return createRootCause(err)
+	return createRootCause(http.StatusInternalServerError, err)
+}
+
+func RootCauseWithCode(code int, err error) error {
+	if err == nil {
+		return nil
+	}
+	return createRootCause(code, err)
 }
 
 func (r *rootCauseError) Error() string {
@@ -24,6 +33,10 @@ func (r *rootCauseError) Error() string {
 
 func (r *rootCauseError) At() *runtime.Frame {
 	return r.caller
+}
+
+func (r *rootCauseError) StatusCode() int {
+	return r.code
 }
 
 func getCaller(callerSkip int) (fr runtime.Frame, ok bool) {
@@ -37,8 +50,8 @@ func getCaller(callerSkip int) (fr runtime.Frame, ok bool) {
 	return f, f.PC != 0
 }
 
-func createRootCause(cause error) error {
-	err := &rootCauseError{err: cause}
+func createRootCause(code int, cause error) error {
+	err := &rootCauseError{code: code, err: cause}
 
 	lvl := 4 // stack level
 	if caller, ok := getCaller(lvl); ok {

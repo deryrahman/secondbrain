@@ -1,5 +1,6 @@
 package handler
 
 type HTTPResponse interface {
-	WriteJSON(content any) error
+	WriteJSON(content any)
+	WriteError(err error)
 }
