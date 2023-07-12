@@ -1,9 +1,7 @@
 .PHONY: all build
 
 build:
-	rm -rf build
-	mkdir build
-	go build -o ./build/secondbrain ./cmd
+	goreleaser build --single-target --clean --snapshot
 
 lint:
 	golangci-lint run
@@ -24,3 +22,5 @@ dev-tools:
 	go install github.com/rubenv/sql-migrate/...@v1.5.1
 	go install github.com/kyleconroy/sqlc/cmd/sqlc@v1.18.0
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.13.0
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.53.3
+	go install github.com/goreleaser/goreleaser@v1.19.2
