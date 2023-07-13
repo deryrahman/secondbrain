@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
+	"github.com/deryrahman/secondbrain/pkg/errors"
+	l "github.com/deryrahman/secondbrain/pkg/log"
 	log "github.com/deryrahman/secondbrain/pkg/log/slog"
 	server "github.com/deryrahman/secondbrain/server/http"
 	"github.com/deryrahman/secondbrain/service/core"
@@ -32,28 +35,29 @@ func serveActionFunc() cli.ActionFunc {
 
 		logger := log.NewSLog(slog.DebugLevel)
 		db, err := storage.NewPSQLDB(dsn)
-		if err != nil {
-			logger.Fatal(err)
-			return err //nolint:wrapcheck
-		}
-		recordStorage, err := storage.NewRecordStoragePSQL(db, storage.NewPSQLQuerier())
-		if err != nil {
-			logger.Fatal(err)
-			return err //nolint:wrapcheck
-		}
-		recordService, err := core.NewRecordService(recordStorage)
-		if err != nil {
-			logger.Fatal(err)
-			return err //nolint:wrapcheck
-		}
+		fatalAndExit(logger, err)
+
+		recordStorage, err := storage.NewRecordStoragePSQL(logger, db, storage.NewPSQLQuerier())
+		fatalAndExit(logger, err)
+
+		recordService, err := core.NewRecordService(logger, recordStorage)
+		fatalAndExit(logger, err)
+
 		apiPath := fmt.Sprintf("/api/v%s", strings.Split(version, "-")[0])
 		httpServer, err := server.NewHTTPServer(apiPath, logger, recordService)
-		if err != nil {
-			logger.Fatal(err)
-			return err //nolint:wrapcheck
-		}
+		fatalAndExit(logger, err)
 
 		logger.Infof("server running on port %s", port)
-		return http.ListenAndServe(port, httpServer) //nolint:wrapcheck
+		if err := http.ListenAndServe(port, httpServer); err != nil {
+			return errors.Wrap(err)
+		}
+		return nil
+	}
+}
+
+func fatalAndExit(logger l.Logger, err error) {
+	if err != nil {
+		logger.Fatal(err)
+		os.Exit(1)
 	}
 }

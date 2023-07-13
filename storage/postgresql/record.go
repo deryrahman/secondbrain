@@ -7,6 +7,7 @@ import (
 	codegenStorage "github.com/deryrahman/secondbrain/codegen/storage"
 	model "github.com/deryrahman/secondbrain/model/storage"
 	"github.com/deryrahman/secondbrain/pkg/errors"
+	"github.com/deryrahman/secondbrain/pkg/log"
 	"github.com/deryrahman/secondbrain/storage"
 	"github.com/google/uuid"
 )
@@ -17,12 +18,16 @@ var (
 )
 
 type recordStorage struct {
+	logger  log.Logger
 	db      storage.DB
 	querier codegenStorage.Querier
 }
 
-func NewRecordStoragePSQL(db storage.DB, querier codegenStorage.Querier) (*recordStorage, error) {
+func NewRecordStoragePSQL(logger log.Logger, db storage.DB, querier codegenStorage.Querier) (*recordStorage, error) {
 	var err error
+	if logger == nil {
+		err = errors.Join(err, fmt.Errorf("logger is nil"))
+	}
 	if db == nil {
 		err = errors.Join(err, fmt.Errorf("db is nil"))
 	}
@@ -34,6 +39,7 @@ func NewRecordStoragePSQL(db storage.DB, querier codegenStorage.Querier) (*recor
 	}
 
 	return &recordStorage{
+		logger:  logger,
 		db:      db,
 		querier: querier,
 	}, nil

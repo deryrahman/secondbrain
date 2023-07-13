@@ -6,6 +6,7 @@ import (
 
 	model "github.com/deryrahman/secondbrain/model/service"
 	"github.com/deryrahman/secondbrain/pkg/errors"
+	"github.com/deryrahman/secondbrain/pkg/log"
 	"github.com/deryrahman/secondbrain/service"
 	"github.com/deryrahman/secondbrain/storage"
 	"github.com/google/uuid"
@@ -19,14 +20,24 @@ type RecordStorager interface {
 var _ service.RecordService = (*recordService)(nil)
 
 type recordService struct {
+	logger         log.Logger
 	recordStorager RecordStorager
 }
 
-func NewRecordService(recordStorager RecordStorager) (*recordService, error) {
-	if recordStorager == nil {
-		return nil, fmt.Errorf("recordStorager is nil")
+func NewRecordService(logger log.Logger, recordStorager RecordStorager) (*recordService, error) {
+	var err error
+	if logger == nil {
+		err = errors.Join(err, fmt.Errorf("logger is nil"))
 	}
+	if recordStorager == nil {
+		err = errors.Join(err, fmt.Errorf("recordStorager is nil"))
+	}
+	if err != nil {
+		return nil, errors.RootCause(err)
+	}
+
 	return &recordService{
+		logger:         logger,
 		recordStorager: recordStorager,
 	}, nil
 }
