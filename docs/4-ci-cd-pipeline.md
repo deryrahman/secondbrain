@@ -69,6 +69,9 @@ Release strategy will use the default practices.
 
 Release branches should have the major version syntax: eg, releases/v1, releases/v2, etc, while the tags is the complete version but under the same major version on the corresponding release branches. tag v1.0.2 will be on the branch releases/v1, etc.
 
+- Release branch is only being used to create tag, any branches are not allowed to create a tag.
+- It should provide the git hook to prevent the tag being created outside the release branches
+
 ## Deploy Strategy
 
-For now, deployment strategy is scoped only on GCP VM. The CI/CD will be deploy the build through terraform.
+For now, deployment strategy is scoped only on GCP VM. The CI/CD will be deploy the build through terraform. For now, deploy srategy is not provided yet.
