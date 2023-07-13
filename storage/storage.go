@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/deryrahman/secondbrain/model"
+	model "github.com/deryrahman/secondbrain/model/storage"
 	"github.com/google/uuid"
 )
 
@@ -17,9 +17,9 @@ type DB interface {
 }
 
 type RecordModifier interface {
-	CreateRecordWithTags(ctx context.Context, id uuid.UUID, content string, tags ...string) (*model.RecordOnStorage, error)
+	CreateRecordWithTags(ctx context.Context, id uuid.UUID, content string, tags ...string) (*model.CreateRecordWithTagsResponse, error)
 }
 
 type RecordGetter interface {
-	GetRecordsByTags(ctx context.Context, tags ...string) ([]model.RecordOnStorage, error)
+	GetRecordsByTags(ctx context.Context, tags ...string) ([]*model.GetRecordByTagsResponse, error)
 }

@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const associateNoteToTag = `-- name: AssociateNoteToTag :exec
@@ -43,39 +44,37 @@ func (q *Queries) CreateRecord(ctx context.Context, db DBTX, arg CreateRecordPar
 }
 
 const getRecordsByTag = `-- name: GetRecordsByTag :many
-select id, content, record_id, tag_id from record join record_tag on id=record_id
-where tag_id=$1
+with records_tags as (
+  select distinct(id), content from record join record_tag on id=record_id where tag_id=any($1::text[])
+)
+select r.id, r.content, array_agg(rt.tag_id)::text[] as tags
+from records_tags as r join record_tag as rt on r.id=rt.record_id
+group by r.id, r.content
 `
 
 type GetRecordsByTagParams struct {
-	TagID string
+	Column1 []string
 }
 
 type GetRecordsByTagRow struct {
-	ID       uuid.UUID
-	Content  string
-	RecordID uuid.UUID
-	TagID    string
+	ID      uuid.UUID
+	Content string
+	Tags    []string
 }
 
-func (q *Queries) GetRecordsByTag(ctx context.Context, db DBTX, arg GetRecordsByTagParams) ([]GetRecordsByTagRow, error) {
-	rows, err := db.QueryContext(ctx, getRecordsByTag, arg.TagID)
+func (q *Queries) GetRecordsByTag(ctx context.Context, db DBTX, arg GetRecordsByTagParams) ([]*GetRecordsByTagRow, error) {
+	rows, err := db.QueryContext(ctx, getRecordsByTag, pq.Array(arg.Column1))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetRecordsByTagRow
+	var items []*GetRecordsByTagRow
 	for rows.Next() {
 		var i GetRecordsByTagRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.RecordID,
-			&i.TagID,
-		); err != nil {
+		if err := rows.Scan(&i.ID, &i.Content, pq.Array(&i.Tags)); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, &i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

@@ -31,6 +31,7 @@ func NewHTTPServer(baseURL string, logger log.Logger, recordService service.Reco
 	if err != nil {
 		return nil, errors.RootCause(err)
 	}
+	logger.Infof("ready to serve request on base path %s", baseURL)
 
 	return &httpServer{
 		baseURL:       baseURL,
@@ -40,6 +41,7 @@ func NewHTTPServer(baseURL string, logger log.Logger, recordService service.Reco
 }
 
 func (h *httpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.logger.Infof("request [%s] %s", r.Method, r.URL.String())
 	h.Handler().ServeHTTP(w, r)
 }
 
@@ -49,8 +51,8 @@ func (h *httpServer) Handler() http.Handler {
 	})
 }
 
-func (h *httpServer) GetRecords(w http.ResponseWriter, r *http.Request) {
-	handler.HandleHTTPGetRecords(h.recordService)(w, r)
+func (h *httpServer) GetRecords(w http.ResponseWriter, r *http.Request, params codegenHandler.GetRecordsParams) {
+	handler.HandleHTTPGetRecords(h.logger, h.recordService, params)(w, r)
 }
 
 func (h *httpServer) PostRecords(w http.ResponseWriter, r *http.Request) {

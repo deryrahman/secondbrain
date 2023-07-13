@@ -13,5 +13,9 @@ func NewPSQLDB(dsn string) (storage.DB, error) {
 	if err != nil {
 		return nil, errors.RootCause(err)
 	}
+	if err := db.Ping(); err != nil {
+		return nil, errors.RootCause(err)
+	}
+	// check schema
 	return db, nil
 }

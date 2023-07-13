@@ -10,6 +10,11 @@ type RecordSnippet struct {
 	Tags    *[]string `json:"tags,omitempty"`
 }
 
+// GetRecordsParams defines parameters for GetRecords.
+type GetRecordsParams struct {
+	Tag *[]string `form:"tag,omitempty" json:"tag,omitempty"`
+}
+
 // PostRecordsJSONBody defines parameters for PostRecords.
 type PostRecordsJSONBody struct {
 	Content *string   `json:"content,omitempty"`

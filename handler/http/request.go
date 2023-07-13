@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 
 	"github.com/deryrahman/secondbrain/handler"
 	"github.com/deryrahman/secondbrain/pkg/errors"
@@ -39,10 +38,6 @@ func (r *request[bodyStruct]) GetJSONBody() (bodyStruct, error) {
 	return value, nil
 }
 
-func (r *request[bodyStruct]) GetHeaders() http.Header {
-	return r.Response.Header
-}
-
-func (r *request[bodyStruct]) GetURL() url.URL {
-	return *r.Request.URL
+func (r *request[bodyStruct]) GetQueryParams() map[string][]string {
+	return r.URL.Query()
 }

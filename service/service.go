@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/deryrahman/secondbrain/model"
+	model "github.com/deryrahman/secondbrain/model/service"
 )
 
 type RecordService interface {
 	CreateRecord(ctx context.Context, content string, tags ...string) (string, error)
-	GetRecords(ctx context.Context, tags ...string) ([]model.RecordOnService, error)
+	GetRecords(ctx context.Context, tags ...string) ([]*model.GetRecordResponse, error)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	log "github.com/deryrahman/secondbrain/pkg/log/slog"
 	server "github.com/deryrahman/secondbrain/server/http"
@@ -45,7 +46,7 @@ func serveActionFunc() cli.ActionFunc {
 			logger.Fatal(err)
 			return err //nolint:wrapcheck
 		}
-		apiPath := fmt.Sprintf("/api/%s", version)
+		apiPath := fmt.Sprintf("/api/v%s", strings.Split(version, "-")[0])
 		httpServer, err := server.NewHTTPServer(apiPath, logger, recordService)
 		if err != nil {
 			logger.Fatal(err)

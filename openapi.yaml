@@ -6,7 +6,7 @@ info:
     to build their own client or application.
   version: 0.0.1
 servers:
-  - url: http://localhost:8080/api/v0.0.1
+  - url: http://localhost:8080/api/v0.0.0
 paths:
   /ping:
     get:
@@ -48,6 +48,14 @@ paths:
     get:
       tags:
         - record
+      parameters:
+        - name: tag
+          in: query
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         200:
           description: record found

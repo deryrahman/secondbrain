@@ -32,13 +32,11 @@ func NewHTTPResponse(logger log.Logger, httpWriter http.ResponseWriter) (*respon
 }
 
 func (r *response) WriteJSON(content any) {
-	raw, err := json.Marshal(content)
-	if err != nil {
+	r.writer.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewEncoder(r.writer).Encode(content); err != nil {
 		r.logger.Error(errors.RootCause(err))
-	}
-	_, err = r.writer.Write(raw)
-	if err != nil {
-		r.logger.Error(errors.RootCause(err))
+		r.writer.WriteHeader(http.StatusInternalServerError)
 	}
 }
 

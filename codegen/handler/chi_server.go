@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -17,7 +18,7 @@ type ServerInterface interface {
 	GetPing(w http.ResponseWriter, r *http.Request)
 
 	// (GET /records)
-	GetRecords(w http.ResponseWriter, r *http.Request)
+	GetRecords(w http.ResponseWriter, r *http.Request, params GetRecordsParams)
 
 	// (POST /records)
 	PostRecords(w http.ResponseWriter, r *http.Request)
@@ -51,8 +52,21 @@ func (siw *ServerInterfaceWrapper) GetPing(w http.ResponseWriter, r *http.Reques
 func (siw *ServerInterfaceWrapper) GetRecords(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetRecordsParams
+
+	// ------------- Optional query parameter "tag" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "tag", r.URL.Query(), &params.Tag)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "tag", Err: err})
+		return
+	}
+
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRecords(w, r)
+		siw.Handler.GetRecords(w, r, params)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/deryrahman/secondbrain/model"
+	model "github.com/deryrahman/secondbrain/model/service"
 	"github.com/deryrahman/secondbrain/pkg/errors"
 	"github.com/deryrahman/secondbrain/service"
 	"github.com/deryrahman/secondbrain/storage"
@@ -40,6 +40,17 @@ func (s *recordService) CreateRecord(ctx context.Context, content string, tags .
 	return id.String(), nil
 }
 
-func (s *recordService) GetRecords(ctx context.Context, tags ...string) ([]model.RecordOnService, error) {
-	return nil, nil
+func (s *recordService) GetRecords(ctx context.Context, tags ...string) ([]*model.GetRecordResponse, error) {
+	records, err := s.recordStorager.GetRecordsByTags(ctx, tags...)
+	if err != nil {
+		return nil, errors.Wrap(err)
+	}
+
+	recordsResponse := make([]*model.GetRecordResponse, len(records))
+	for i, record := range records {
+		recordsResponse[i] = &model.GetRecordResponse{}
+		recordsResponse[i].From(record)
+	}
+
+	return recordsResponse, nil
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	codegenStorage "github.com/deryrahman/secondbrain/codegen/storage"
-	"github.com/deryrahman/secondbrain/model"
+	model "github.com/deryrahman/secondbrain/model/storage"
 	"github.com/deryrahman/secondbrain/pkg/errors"
 	"github.com/deryrahman/secondbrain/storage"
 	"github.com/google/uuid"
@@ -39,7 +39,7 @@ func NewRecordStoragePSQL(db storage.DB, querier codegenStorage.Querier) (*recor
 	}, nil
 }
 
-func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, content string, tags ...string) (*model.RecordOnStorage, error) {
+func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, content string, tags ...string) (*model.CreateRecordWithTagsResponse, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, errors.RootCause(err)
@@ -74,10 +74,21 @@ func (s *recordStorage) CreateRecordWithTags(ctx context.Context, id uuid.UUID, 
 	if err := tx.Commit(); err != nil {
 		return nil, errors.RootCause(err)
 	}
-	return &model.RecordOnStorage{ID: id, Content: content}, nil
+	return &model.CreateRecordWithTagsResponse{ID: id, Content: content}, nil
 }
 
-func (s *recordStorage) GetRecordsByTags(ctx context.Context, tags ...string) ([]model.RecordOnStorage, error) {
-	// TODO: implement here
-	return nil, nil
+func (s *recordStorage) GetRecordsByTags(ctx context.Context, tags ...string) ([]*model.GetRecordByTagsResponse, error) {
+	getRecordsByTagParams := codegenStorage.GetRecordsByTagParams{Column1: tags}
+	records, err := s.querier.GetRecordsByTag(ctx, s.db, getRecordsByTagParams)
+	if err != nil {
+		return nil, errors.RootCause(err)
+	}
+
+	recordsResponse := make([]*model.GetRecordByTagsResponse, len(records))
+	for i, record := range records {
+		recordsResponse[i] = &model.GetRecordByTagsResponse{}
+		recordsResponse[i].From(record)
+	}
+
+	return recordsResponse, nil
 }

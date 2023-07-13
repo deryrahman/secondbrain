@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/deryrahman/secondbrain/model"
+	model "github.com/deryrahman/secondbrain/model/handler"
 	"github.com/deryrahman/secondbrain/pkg/log"
 	"github.com/deryrahman/secondbrain/service"
 )
@@ -17,7 +17,7 @@ func HandleHTTPPostRecords(logger log.Logger, s service.RecordService) http.Hand
 			return
 		}
 
-		req, err := NewHTTPRequest[model.PostRecordsJSONRequestBody](r)
+		req, err := NewHTTPRequest[model.PostRecordsRequest](r)
 		if err != nil {
 			logger.Error(err)
 			resp.WriteError(err)
@@ -38,6 +38,6 @@ func HandleHTTPPostRecords(logger log.Logger, s service.RecordService) http.Hand
 			return
 		}
 
-		resp.WriteJSON(model.PostRecordsJSONResponseBody{Id: id})
+		resp.WriteJSON(model.PostRecordsResponse{ID: id})
 	}
 }
