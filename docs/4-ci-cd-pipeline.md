@@ -1,4 +1,4 @@
-# CI/CD Pipeline
+# [RFC 4] CI/CD Pipeline
 Status: Draft
 
 This RFC contains initial comprehensive analysis of how the CI/CD pipeline should be introduced. It explains about the code quality, build strategy, release strategy, and deploy strategy.
