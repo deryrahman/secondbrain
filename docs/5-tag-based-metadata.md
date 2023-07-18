@@ -11,21 +11,41 @@ This RFC aims to provide sufficient specification for building a metadata based 
 ## Tag Syntax
 Three types of tags are structured in the following syntax:
 
-| No | Type   | Proposed Syntax          |
-|----|--------|--------------------------|
-| 1  | user   | user;<tag_name>          |
-| 2  | core   | core;<data_type>;<value> |
-| 3  | plugin | plugin;<plugin_syntax>   |
+| No | Type   | Proposed Syntax                      |
+|----|--------|--------------------------------------|
+| 1  | user   | user;<tag_name>                      |
+| 2  | core   | core;<data_type>;<value>             |
+| 3  | plugin | plugin;<plugin_id>;<plugin_syntax>   |
 
 The entity is separated by semi-colon `;`, hence the tag_name are not allowed to contains semi-colon.
 
 **User Defined Tags**
 
-This is the simplest tag's type. The value can only be defined from the end-user. The usage of this tag's type is limited on search, filter, and sort action.
+This is the simplest tag's type. The value can only be defined from the end-user. The usage of this tag's type is limited on search and filter actions. For example, these following are the example of user's generated tags associated with record ids:
+
+
+| record_id | tags                            |
+|-----------|---------------------------------|
+| 0001      | [user;personal, user;important] |
+| 0002      | [user;personal, user;urgent]    |
+| 0003      | [user;work]                     |
+
+- search + filter : tag=personal&tag=urgent
+- result : [0002, 0001]
+
+The sort type is based on the complete most tags. It means the record which contains most complete tag specified in the filter are shown on the top.
 
 **Core Defined Tags**
 
 The core tag's type contains information on what are the system can do on that records. The creation of this tag is automatically created by the system whenever the record is created. The system defined the action (on this case search / filter, sort). In API perspective, user are not allowed to use this tag under the `tag` query params. The system should provide the query params for corresponding api endpoint based on the `data_type` introduced by this tag. For example, system provided the `data_type` date, then the corresponding api endpoints should have `date` query params for supporting this kind of tag.
+
+Unlike the user defined tag, core defined tag has their own class implementation, which are required to increase the flexibility of how the tag should operate. For example, core tag `date`, which will be used to add creation date to the specified record. In that case, system should be able to know, how the `date` is generated and used. Another core tag example is `record_type`, which will be used to mark the record as a todo list, plain, or anything. For the above scenario, the core defined tags should contains these following implementation:
+
+- WhenToGenerate: will it be generated whenever user create a record? modified a record? or just simply waiting for the conditions / event of the record to be triggered?
+- HowToGenerate: how the tag is generated, what is the format? in which data source (if any) should be invoked? etc
+- Action: how the tag is being used
+
+For the initial implementation, the core defined tags are only scoped to `date`. This tag will be generated whenever the record is created. The format should follow timestamp in UTC, and the search / filter / sort is based on the user location.
 
 **Plugin Defined Tags**
 
@@ -52,3 +72,7 @@ Under the prefix `core;`
 - provide autotag generation for every record created
 - validation (should not have semi-colon is handled on system level)
 Each data type provide unique functions on which they will handle the corresponding value
+
+## Plan
+
+In the future, core defined tags and plugin defined tags are defined from standard specification.
