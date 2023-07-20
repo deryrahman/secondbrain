@@ -33,7 +33,7 @@ This is the simplest tag's type. The value can only be defined from the end-user
 - search + filter : tag=personal&tag=urgent
 - result : [0002, 0001]
 
-The sort type is based on the complete most tags. It means the record which contains most complete tag specified in the filter are shown on the top.
+The sort type is based on the complete most tags. It means the sort is based on the record which contains most complete tag specified in the filter.
 
 **Core Defined Tags**
 
@@ -75,4 +75,4 @@ Each data type provide unique functions on which they will handle the correspond
 
 ## Plan
 
-In the future, core defined tags and plugin defined tags are defined from standard specification.
+In the future, core defined tags and plugin defined tags are comes from the same standard specification.
