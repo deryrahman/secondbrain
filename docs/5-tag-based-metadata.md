@@ -1,7 +1,7 @@
 # [RFC 5] Tag Based Metadata
 Status: Draft
 
-This RFC aims to provide sufficient specification for building a metadata based on tag. The capability of this metadata is used for generic search, filtering, sorting and storing any useful information for the extended capability through plugin (which will be explained on the different RFC later). The basic idea of tags is to support the `recalling`, `organizing`, and `extending` capability. Tag should be named in a very short term and should not contain any full information but keeps complete and compact. For the initial specification, tag will have 3 major categories, first is `user` which are defined by end-user, second is `core` which to be used on the core system, third is `plugin` which to be used on the plugin specified functions. This RFC scoped only for the high level design.
+This RFC aims to provide sufficient specification for building a metadata based on tag. The capability of this metadata is used for generic search, filtering, sorting and storing any useful information for the extended capability through plugin (which will be explained on the different RFC later). The basic idea of tags is to support the `recalling`, `organizing`, and `extending` capability. Tag should be named in a very short term and should not contain any full information but keeps complete and compact. Tag must only contain non-sensitive information. For the initial specification, tag will have 3 major categories, first is `user` which are defined by end-user, second is `core` which to be used on the core system, third is `plugin` which to be used on the plugin specified functions. This RFC scoped only for the high level design.
 
 ## Purposes
 - Generic search / filtering: search based on date, category, etc (the feature of search will be explain on the different RFC later)
@@ -44,6 +44,33 @@ Unlike the user defined tag, core defined tag has their own class implementation
 - WhenToGenerate: will it be generated whenever user create a record? modified a record? or just simply waiting for the conditions / event of the record to be triggered?
 - HowToGenerate: how the tag is generated, what is the format? in which data source (if any) should be invoked? etc
 - Action: how the tag is being used
+- Value: any value on the tag
+
+For example tag `date`, when to generate? On creation. When to create, should listen to the event when the record is being created. How to generate? It fetch the date now() with timestamp / ISO standard format, then the how part must comes from function which returns the expected value. On the actions part, how the tag is being sort / filtered.
+
+By this, there're things need to consider:
+1. event listener on when the tag should be created (it will decouple the system implementation with the core tag)
+2. when particular event is received, how the system should create the tag, so there will be defined on onCreateEvent
+3. actions will receive a bunch of record, and can behave to sort / filter / enrich (if that is necessary)
+
+```
+records?core_tag={tag_type=date&on=sort_ascending}
+records?core_tag={tag_type=date&on=sort_descending}
+records?core_tag={tag_type=date&on=enrich_utc+7}
+records?core_tag={tag_type=record_type&on=filter_checklist}
+records?core_tag={tag_type=record_type&on=filter_normal}
+records?core_tag={tag_type=record_type&on=filter_markdown}
+
+{} -> url encoded / base64
+```
+
+There's also piping mechanism on the core tag, which the output of the previous core tag params will be an input of the next core tag params. For example:
+
+```
+records?core_tag={tag_type=record_type&on=filter_markdown}&core_tag={tag_type=date&on=sort_ascending}
+```
+
+System fetch all records, then filter them which the type is markdown, then sort the result in ascending order based on the date creation.
 
 For the initial implementation, the core defined tags are only scoped to `date`. This tag will be generated whenever the record is created. The format should follow timestamp in UTC, and the search / filter / sort is based on the user location.
 
